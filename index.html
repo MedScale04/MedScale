@@ -130,7 +130,7 @@
             box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
         }
 
-        .unit-tag {
+        .credit-tag {
             background-color: #e2e8f0;
             color: #334155;
             padding: 6px 10px;
@@ -240,7 +240,7 @@
                 <tr>
                     <th>Subject</th>
                     <th style="width: 100px; text-align: center;">Score</th>
-                    <th style="width: 80px; text-align: center;">Units</th>
+                    <th style="width: 80px; text-align: center;">Credits</th>
                 </tr>
             </thead>
             <tbody id="subjects-body">
@@ -273,35 +273,35 @@
 <script>
     const dynamicData = {
         1: { divisor: 35, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
-            { name: "Anatomy", units: 8 }, { name: "Biochemistry", units: 6 }, { name: "Biology", units: 6 },
-            { name: "Physics", units: 5 }, { name: "Foundations of medicine", units: 2 }, { name: "Terminology", units: 2 },
-            { name: "Human rights", units: 2 }, { name: "Arabic language", units: 2 }, { name: "Computer", units: 2 }
+            { name: "Anatomy", credits: 8 }, { name: "Biochemistry", credits: 6 }, { name: "Biology", credits: 6 },
+            { name: "Physics", credits: 5 }, { name: "Foundations of medicine", credits: 2 }, { name: "Terminology", credits: 2 },
+            { name: "Human rights", credits: 2 }, { name: "Arabic language", credits: 2 }, { name: "Computer", credits: 2 }
         ]},
         2: { divisor: 47, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
-            { name: "Physiology", units: 13 }, { name: "Anatomy", units: 10 }, { name: "Biochemistry", units: 8 },
-            { name: "Histology", units: 6 }, { name: "Embryology", units: 2 }, { name: "Medical ethics", units: 2 },
-            { name: "Baath crimes", units: 2 }, { name: "Computer", units: 2 }, { name: "Arabic language", units: 2 }
+            { name: "Physiology", credits: 13 }, { name: "Anatomy", credits: 10 }, { name: "Biochemistry", credits: 8 },
+            { name: "Histology", credits: 6 }, { name: "Embryology", credits: 2 }, { name: "Medical ethics", credits: 2 },
+            { name: "Baath crimes", credits: 2 }, { name: "Computer", credits: 2 }, { name: "Arabic language", credits: 2 }
         ]},
         3: { divisor: 45, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
-            { name: "Pathology", units: 12 }, { name: "Pharmacology", units: 8 }, { name: "Microbiology", units: 8 },
-            { name: "Parasitology", units: 6 }, { name: "Medicine", units: 6 }, { name: "Community medicine", units: 3 }, { name: "Surgery", units: 2 }
+            { name: "Pathology", credits: 12 }, { name: "Pharmacology", credits: 8 }, { name: "Microbiology", credits: 8 },
+            { name: "Parasitology", credits: 6 }, { name: "Medicine", credits: 6 }, { name: "Community medicine", credits: 3 }, { name: "Surgery", credits: 2 }
         ]},
         4: { divisor: 48, scaleMax: 20, label: "Rate (from 20):", suffix: " / 20", subjects: [
-            { name: "Medicine", units: 12 },
-            { name: "Community medicine", units: 11 },
-            { name: "Surgery", units: 9 }, // Updated from 8 to 9
-            { name: "Obstetric", units: 7 },
-            { name: "Forensic medicine", units: 6 },
-            { name: "Behaviors", units: 2 },
-            { name: "Pediatric", units: 1 }
+            { name: "Medicine", credits: 12 },
+            { name: "Community medicine", credits: 11 },
+            { name: "Surgery", credits: 9 }, 
+            { name: "Obstetric", credits: 7 },
+            { name: "Forensic medicine", credits: 6 },
+            { name: "Behaviors", credits: 2 },
+            { name: "Pediatric", credits: 1 }
         ]},
         5: { divisor: 44, scaleMax: 25, label: "Rate (from 25):", suffix: " / 25", subjects: [
-            { name: "Surgery", units: 8 }, { name: "Medicine", units: 6 }, { name: "Pediatric", units: 6 },
-            { name: "Gynecology", units: 6 }, { name: "Psychiatry", units: 4 }, { name: "Radiology", units: 3 },
-            { name: "Dermatology", units: 3 }, { name: "Ophthalmology", units: 3 }, { name: "ENT", units: 3 }, { name: "Family medicine", units: 2 }
+            { name: "Surgery", credits: 8 }, { name: "Medicine", credits: 6 }, { name: "Pediatric", credits: 6 },
+            { name: "Gynecology", credits: 6 }, { name: "Psychiatry", credits: 4 }, { name: "Radiology", credits: 3 },
+            { name: "Dermatology", credits: 3 }, { name: "Ophthalmology", credits: 3 }, { name: "ENT", credits: 3 }, { name: "Family medicine", credits: 2 }
         ]},
         6: { divisor: 44, scaleMax: 40, label: "Rate (from 40):", suffix: " / 40", subjects: [
-            { name: "Medicine", units: 12 }, { name: "Surgery", units: 12 }, { name: "OB/GYN", units: 10 }, { name: "Pediatric", units: 10 }
+            { name: "Medicine", credits: 12 }, { name: "Surgery", credits: 12 }, { name: "OB/GYN", credits: 10 }, { name: "Pediatric", credits: 10 }
         ]}
     };
 
@@ -323,8 +323,8 @@
             const row = document.createElement('tr');
             row.innerHTML = `
                 <td>${subject.name}</td>
-                <td style="text-align: center;"><input type="number" class="score-input" data-unit="${subject.units}" min="0" max="100" placeholder="0" inputmode="decimal"></td>
-                <td style="text-align: center;"><span class="unit-tag">×${subject.units}</span></td>
+                <td style="text-align: center;"><input type="number" class="score-input" data-credit="${subject.credits}" min="0" max="100" placeholder="0" inputmode="decimal"></td>
+                <td style="text-align: center;"><span class="credit-tag">×${subject.credits}</span></td>
             `;
             tableBody.appendChild(row);
         });
@@ -344,8 +344,8 @@
 
         inputs.forEach(input => {
             const score = parseFloat(input.value) || 0;
-            const unit = parseFloat(input.getAttribute('data-unit'));
-            totalWeightedScore += score * unit;
+            const credit = parseFloat(input.getAttribute('data-credit'));
+            totalWeightedScore += score * credit;
         });
 
         const rateFrom100 = totalWeightedScore / configuration.divisor;
@@ -388,13 +388,13 @@
         const tableRows = [];
         configuration.subjects.forEach((subject, index) => {
             const scoreVal = inputs[index].value || "0";
-            tableRows.push([subject.name, scoreVal, `x${subject.units}`]);
+            tableRows.push([subject.name, scoreVal, `x${subject.credits}`]);
         });
 
         // Compute direct tables
         doc.autoTable({
             startY: 45,
-            head: [['SUBJECT CORRELATION', 'EVALUATION SCORE', 'ACADEMIC UNITS']],
+            head: [['SUBJECT CORRELATION', 'EVALUATION SCORE', 'ACADEMIC CREDITS']],
             body: tableRows,
             headStyles: { fillColor: [241, 245, 249], textColor: [71, 85, 105], fontStyle: 'bold', fontSize: 10 },
             bodyStyles: { textColor: [51, 65, 85], fontSize: 11 },
