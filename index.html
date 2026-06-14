@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MedScale - Multi-Year Calculator</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+    
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f6f9;
+            color: #333;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 16px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 2px 6px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+            width: 100%;
+            max-width: 600px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #1e293b;
+            margin-bottom: 8px;
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .year-tabs {
+            display: flex;
+            justify-content: space-between;
+            gap: 6px;
+            margin-bottom: 24px;
+            background-color: #f1f5f9;
+            padding: 4px;
+            border-radius: 25px;
+            overflow-x: auto;
+            white-space: nowrap;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .year-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #64748b;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            min-width: 55px;
+        }
+
+        .tab.active {
+            background-color: #3498db;
+            color: white;
+            box-shadow: 0 2px 8px rgba(52, 152, 219, 0.3);
+        }
+
+        .table-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            text-align: left;
+            padding: 12px 10px;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            border-bottom: 2px solid #e2e8f0;
+        }
+
+        td {
+            padding: 14px 10px;
+            border-bottom: 1px solid #f1f5f9;
+            font-size: 15px;
+            color: #334155;
+        }
+
+        input[type="number"] {
+            width: 85px;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 16px;
+            text-align: center;
+            background-color: #f8fafc;
+            transition: all 0.2s;
+        }
+
+        input[type="number"]:focus {
+            outline: none;
+            border-color: #3498db;
+            background-color: #fff;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        .unit-tag {
+            background-color: #e2e8f0;
+            color: #334155;
+            padding: 6px 10px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 13px;
+            display: inline-block;
+        }
+
+        .results-section {
+            background-color: #f8fafc;
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 24px;
+        }
+
+        .result-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 0;
+            font-size: 15px;
+            color: #475569;
+        }
+
+        .result-row.total {
+            border-top: 2px dashed #cbd5e1;
+            margin-top: 10px;
+            padding-top: 16px;
+            font-weight: 700;
+            font-size: 18px;
+            color: #1e293b;
+        }
+
+        .result-value {
+            font-weight: 700;
+            color: #16a34a;
+        }
+
+        .btn-download {
+            display: block;
+            width: 100%;
+            background-color: #2ecc71;
+            color: white;
+            border: none;
+            padding: 14px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            margin-bottom: 24px;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(46, 204, 113, 0.2);
+            transition: all 0.2s;
+        }
+
+        .btn-download:hover {
+            background-color: #27ae60;
+        }
+
+        .btn-download:disabled {
+            background-color: #94a3b8;
+            cursor: not-allowed;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 12px;
+            color: #94a3b8;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 16px;
+            font-weight: 500;
+        }
+
+        @media (max-width: 400px) {
+            .container {
+                padding: 16px;
+            }
+            td, th {
+                padding: 10px 6px;
+                font-size: 14px;
+            }
+            input[type="number"] {
+                width: 70px;
+                padding: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container" id="report-card">
+    <h1>MedScale</h1>
+    <div class="year-tabs">
+        <span class="tab" data-year="1">1st</span>
+        <span class="tab" data-year="2">2nd</span>
+        <span class="tab" data-year="3">3rd</span>
+        <span class="tab active" data-year="4">4th</span>
+        <span class="tab" data-year="5">5th</span>
+        <span class="tab" data-year="6">6th</span>
+    </div>
+
+    <div class="table-wrapper">
+        <table>
+            <thead>
+                <tr>
+                    <th>Subject</th>
+                    <th style="width: 100px; text-align: center;">Score</th>
+                    <th style="width: 80px; text-align: center;">Units</th>
+                </tr>
+            </thead>
+            <tbody id="subjects-body">
+                </tbody>
+        </table>
+    </div>
+
+    <div class="results-section">
+        <div class="result-row">
+            <span>Total Weighted Score:</span>
+            <span class="result-value" id="total-score">0.00</span>
+        </div>
+        <div class="result-row">
+            <span>Rate (from 100%):</span>
+            <span class="result-value" id="rate-100">0.00%</span>
+        </div>
+        <div class="result-row total">
+            <span id="rate-label-secondary">Rate (from 20):</span>
+            <span class="result-value" id="rate-secondary" style="font-size:20px; color:#059669;">0.00 / 20</span>
+        </div>
+    </div>
+
+    <button class="btn-download" id="btn-download-pdf">Download Report PDF</button>
+
+    <div class="footer">
+        Developed by Hassan Nouh Hamza &copy; 2026
+    </div>
+</div>
+
+<script>
+    const dynamicData = {
+        1: { divisor: 35, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
+            { name: "Anatomy", units: 8 }, { name: "Biochemistry", units: 6 }, { name: "Biology", units: 6 },
+            { name: "Physics", units: 5 }, { name: "Foundations of medicine", units: 2 }, { name: "Terminology", units: 2 },
+            { name: "Human rights", units: 2 }, { name: "Arabic language", units: 2 }, { name: "Computer", units: 2 }
+        ]},
+        2: { divisor: 47, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
+            { name: "Physiology", units: 13 }, { name: "Anatomy", units: 10 }, { name: "Biochemistry", units: 8 },
+            { name: "Histology", units: 6 }, { name: "Embryology", units: 2 }, { name: "Medical ethics", units: 2 },
+            { name: "Baath crimes", units: 2 }, { name: "Computer", units: 2 }, { name: "Arabic language", units: 2 }
+        ]},
+        3: { divisor: 45, scaleMax: 5, label: "Rate (from 5):", suffix: " / 5", subjects: [
+            { name: "Pathology", units: 12 }, { name: "Pharmacology", units: 8 }, { name: "Microbiology", units: 8 },
+            { name: "Parasitology", units: 6 }, { name: "Medicine", units: 6 }, { name: "Community medicine", units: 3 }, { name: "Surgery", units: 2 }
+        ]},
+        4: { divisor: 46, scaleMax: 20, label: "Rate (from 20):", suffix: " / 20", subjects: [
+            { name: "Medicine", units: 12 }, { name: "Community medicine", units: 11 }, { name: "Surgery", units: 8 },
+            { name: "Obstetric", units: 7 }, { name: "Forensic medicine", units: 6 }, { name: "Pediatric", units: 1 }, { name: "Behavior", units: 1 }
+        ]},
+        5: { divisor: 44, scaleMax: 25, label: "Rate (from 25):", suffix: " / 25", subjects: [
+            { name: "Surgery", units: 8 }, { name: "Medicine", units: 6 }, { name: "Pediatric", units: 6 },
+            { name: "Gynecology", units: 6 }, { name: "Psychiatry", units: 4 }, { name: "Radiology", units: 3 },
+            { name: "Dermatology", units: 3 }, { name: "Ophthalmology", units: 3 }, { name: "ENT", units: 3 }, { name: "Family medicine", units: 2 }
+        ]},
+        6: { divisor: 44, scaleMax: 40, label: "Rate (from 40):", suffix: " / 40", subjects: [
+            { name: "Medicine", units: 12 }, { name: "Surgery", units: 12 }, { name: "OB/GYN", units: 10 }, { name: "Pediatric", units: 10 }
+        ]}
+    };
+
+    let currentYear = 4; 
+    const tableBody = document.getElementById('subjects-body');
+    const totalScoreEl = document.getElementById('total-score');
+    const rate100El = document.getElementById('rate-100');
+    const rateLabelSecondary = document.getElementById('rate-label-secondary');
+    const rateSecondaryEl = document.getElementById('rate-secondary');
+    const tabs = document.querySelectorAll('.tab');
+    const pdfBtn = document.getElementById('btn-download-pdf');
+
+    function renderYearData(yearNum) {
+        currentYear = yearNum;
+        const configuration = dynamicData[yearNum];
+        tableBody.innerHTML = "";
+
+        configuration.subjects.forEach(subject => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${subject.name}</td>
+                <td style="text-align: center;"><input type="number" class="score-input" data-unit="${subject.units}" min="0" max="100" placeholder="0" inputmode="decimal"></td>
+                <td style="text-align: center;"><span class="unit-tag">×${subject.units}</span></td>
+            `;
+            tableBody.appendChild(row);
+        });
+
+        const inputs = document.querySelectorAll('.score-input');
+        inputs.forEach(input => {
+            input.addEventListener('input', calculateScores);
+        });
+
+        calculateScores();
+    }
+
+    function calculateScores() {
+        const configuration = dynamicData[currentYear];
+        const inputs = document.querySelectorAll('.score-input');
+        let totalWeightedScore = 0;
+
+        inputs.forEach(input => {
+            const score = parseFloat(input.value) || 0;
+            const unit = parseFloat(input.getAttribute('data-unit'));
+            totalWeightedScore += score * unit;
+        });
+
+        const rateFrom100 = totalWeightedScore / configuration.divisor;
+        const secondaryRate = (rateFrom100 * configuration.scaleMax) / 100;
+
+        totalScoreEl.textContent = totalWeightedScore.toFixed(2);
+        rate100El.textContent = rateFrom100.toFixed(2) + '%';
+        rateLabelSecondary.textContent = configuration.label;
+        rateSecondaryEl.textContent = secondaryRate.toFixed(2) + configuration.suffix;
+    }
+
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+            renderYearData(parseInt(tab.getAttribute('data-year')));
+        });
+    });
+
+    // MATHEMATICAL COMPILER EXPORT: Flawless layout on iPad/Safari
+    pdfBtn.addEventListener('click', () => {
+        window.jsPDF = window.jspdf.jsPDF;
+        const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+        
+        const configuration = dynamicData[currentYear];
+        const inputs = document.querySelectorAll('.score-input');
+
+        // Main Academic Document Headers
+        doc.setFont("helvetica", "bold");
+        doc.setFontSize(26);
+        doc.setTextColor(30, 41, 59);
+        doc.text("MedScale", 105, 25, { align: "center" });
+
+        doc.setFontSize(13);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(52, 152, 219);
+        doc.text(`OFFICIAL ACADEMIC REPORT: YEAR ${currentYear}`, 105, 33, { align: "center" });
+
+        // Gather metrics securely without element snapshots
+        const tableRows = [];
+        configuration.subjects.forEach((subject, index) => {
+            const scoreVal = inputs[index].value || "0";
+            tableRows.push([subject.name, scoreVal, `x${subject.units}`]);
+        });
+
+        // Compute direct tables
+        doc.autoTable({
+            startY: 45,
+            head: [['SUBJECT CORRELATION', 'EVALUATION SCORE', 'ACADEMIC UNITS']],
+            body: tableRows,
+            headStyles: { fillColor: [241, 245, 249], textColor: [71, 85, 105], fontStyle: 'bold', fontSize: 10 },
+            bodyStyles: { textColor: [51, 65, 85], fontSize: 11 },
+            columnStyles: {
+                0: { halign: 'left', cellWidth: 'auto' },
+                1: { halign: 'center', fontStyle: 'bold', cellWidth: 50 },
+                2: { halign: 'center', cellWidth: 40 }
+            },
+            theme: 'grid',
+            styles: { cellPadding: 5 }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 15;
+
+        // Results Card Compilation
+        doc.setFontSize(12);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        
+        doc.text("Total Weighted Score:", 14, finalY);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(22, 163, 74);
+        doc.text(totalScoreEl.textContent, 196, finalY, { align: "right" });
+
+        finalY += 10;
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(71, 85, 105);
+        doc.text("Rate (from 100%):", 14, finalY);
+        doc.setFont("helvetica", "bold");
+        doc.setTextColor(22, 163, 74);
+        doc.text(rate100El.textContent, 196, finalY, { align: "right" });
+
+        finalY += 6;
+        doc.setDrawColor(203, 213, 225);
+        doc.setLineDashPattern([2, 2], 0);
+        doc.line(14, finalY, 196, finalY);
+        
+        finalY += 10;
+        doc.setFontSize(14);
+        doc.setTextColor(30, 41, 59);
+        doc.text(rateLabelSecondary.textContent, 14, finalY);
+        doc.setTextColor(5, 150, 105);
+        doc.text(rateSecondaryEl.textContent, 196, finalY, { align: "right" });
+
+        // Footer signature alignment
+        doc.setFontSize(10);
+        doc.setFont("helvetica", "normal");
+        doc.setTextColor(148, 163, 184);
+        doc.text("Developed by Hassan Nouh Hamza (c) 2026", 105, 282, { align: "center" });
+
+        // Trigger dynamic download injection
+        doc.save(`MedScale_Year_${currentYear}_Report.pdf`);
+    });
+
+    renderYearData(4);
+</script>
+
+</body>
+</html>
